@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ぼくのガクチカ 紡ごう！あなただけの相模ストーリー</title>
+    <!-- 必要なライブラリの読み込み -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -20,18 +20,17 @@
         @media print {
             .no-print { display: none; }
         }
+        input::placeholder, textarea::placeholder {
+            color: #cbd5e1;
+        }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
+    <!-- type="text/babel" を指定することでブラウザ上でJSXを変換します -->
     <script type="text/babel">
         const { useState, useEffect } = React;
-        
-        // Lucide Icons components
-        const Icon = ({ name, size = 20, className = "" }) => {
-            return <i data-lucide={name} className={className} style={{ width: size, height: size }}></i>;
-        };
 
         const App = () => {
             const [step, setStep] = useState(1);
@@ -45,12 +44,6 @@
             const [questions, setQuestions] = useState({
                 activity: '', theme: ''
             });
-
-            useEffect(() => {
-                if (window.lucide) {
-                    window.lucide.createIcons();
-                }
-            }, [step, loading]);
 
             const handleQuadrantChange = (key, value) => {
                 setQuadrants(prev => ({ ...prev, [key]: value }));
@@ -74,7 +67,7 @@
                 }
 
                 setLoading(true);
-                const apiKey = ""; // APIキーは環境によって自動注入されます
+                const apiKey = ""; // APIキーは自動注入されます
 
                 const prompt = `
                     以下の生徒の高校生活の振り返り（4領域）と見つけた問いを分析し、その問いに向き合うために最適な「学問分野」を2つ提案してください。
@@ -113,7 +106,7 @@
                     setStep(3);
                 } catch (error) {
                     console.error(error);
-                    alert("分析中にエラーが発生しました。");
+                    alert("分析中にエラーが発生しました。内容をもう少し詳しく入力してみてください。");
                 } finally {
                     setLoading(false);
                 }
@@ -135,6 +128,9 @@
                                         <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${step === s ? 'bg-[#A8D1A3] text-white shadow-md' : 'bg-white text-slate-300 border-2 border-slate-100'}`}>
                                             {s}
                                         </div>
+                                        <span className="text-[10px] font-bold text-slate-400">
+                                            {s === 1 ? 'ふりかえり' : s === 2 ? 'とい' : 'みらい'}
+                                        </span>
                                     </div>
                                 ))}
                             </div>
@@ -150,23 +146,43 @@
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="bg-[#EBF3FF] p-5 rounded-2xl border-2 border-blue-50">
                                             <label className="block text-blue-600 font-bold mb-2 text-sm">苦労・悩み・うまくいかない</label>
-                                            <textarea className="w-full h-32 p-3 rounded-xl border-none bg-white/60 text-sm" value={quadrants.topLeft} onChange={(e) => handleQuadrantChange('topLeft', e.target.value)} />
+                                            <textarea 
+                                                className="w-full h-32 p-3 rounded-xl border-none bg-white/60 text-sm focus:ring-2 focus:ring-blue-200 outline-none" 
+                                                value={quadrants.topLeft} 
+                                                onChange={(e) => handleQuadrantChange('topLeft', e.target.value)}
+                                                placeholder="どんなことに悩んだかな？"
+                                            />
                                         </div>
                                         <div className="bg-[#FFF0F3] p-5 rounded-2xl border-2 border-pink-50">
-                                            <label className="block text-pink-600 font-bold mb-2 text-sm">楽しい・好き・興味・夢中</label>
-                                            <textarea className="w-full h-32 p-3 rounded-xl border-none bg-white/60 text-sm" value={quadrants.topRight} onChange={(e) => handleQuadrantChange('topRight', e.target.value)} />
+                                            <label className="block text-pink-600 font-bold mb-2 text-sm">楽しい・好き・興味関心・夢中</label>
+                                            <textarea 
+                                                className="w-full h-32 p-3 rounded-xl border-none bg-white/60 text-sm focus:ring-2 focus:ring-pink-200 outline-none" 
+                                                value={quadrants.topRight} 
+                                                onChange={(e) => handleQuadrantChange('topRight', e.target.value)}
+                                                placeholder="ワクワクしたことは何？"
+                                            />
                                         </div>
-                                        <div className="bg-[#F5F5F5] p-5 rounded-2xl border-2 border-slate-50">
-                                            <label className="block text-slate-500 font-bold mb-2 text-sm">やりたくない・苦手・面倒</label>
-                                            <textarea className="w-full h-32 p-3 rounded-xl border-none bg-white/60 text-sm" value={quadrants.bottomLeft} onChange={(e) => handleQuadrantChange('bottomLeft', e.target.value)} />
+                                        <div className="bg-[#F5F5F5] p-5 rounded-2xl border-2 border-slate-100">
+                                            <label className="block text-slate-500 font-bold mb-2 text-sm">やりたくない・苦手・面倒くさい</label>
+                                            <textarea 
+                                                className="w-full h-32 p-3 rounded-xl border-none bg-white/60 text-sm focus:ring-2 focus:ring-slate-200 outline-none" 
+                                                value={quadrants.bottomLeft} 
+                                                onChange={(e) => handleQuadrantChange('bottomLeft', e.target.value)}
+                                                placeholder="これは苦手だな...と思うこと"
+                                            />
                                         </div>
                                         <div className="bg-[#FFF7ED] p-5 rounded-2xl border-2 border-orange-50">
-                                            <label className="block text-orange-600 font-bold mb-2 text-sm">やりがい・目標・ゆめ</label>
-                                            <textarea className="w-full h-32 p-3 rounded-xl border-none bg-white/60 text-sm" value={quadrants.bottomRight} onChange={(e) => handleQuadrantChange('bottomRight', e.target.value)} />
+                                            <label className="block text-orange-600 font-bold mb-2 text-sm">やりがい・目標・夢</label>
+                                            <textarea 
+                                                className="w-full h-32 p-3 rounded-xl border-none bg-white/60 text-sm focus:ring-2 focus:ring-orange-200 outline-none" 
+                                                value={quadrants.bottomRight} 
+                                                onChange={(e) => handleQuadrantChange('bottomRight', e.target.value)}
+                                                placeholder="やってよかった！と思える瞬間は？"
+                                            />
                                         </div>
                                     </div>
                                     <div className="mt-8 flex justify-end">
-                                        <button onClick={() => setStep(2)} className="bg-[#A8D1A3] hover:bg-[#92C18D] text-white px-10 py-3 rounded-2xl font-bold shadow-sm transition-all">つぎへ進む</button>
+                                        <button onClick={() => setStep(2)} className="bg-[#A8D1A3] hover:bg-[#92C18D] text-white px-10 py-3 rounded-2xl font-bold shadow-sm transition-all transform hover:scale-105">つぎへ進む</button>
                                     </div>
                                 </div>
                             </div>
@@ -181,18 +197,34 @@
                                 <div className="p-10">
                                     <div className="space-y-12">
                                         <div className="text-xl md:text-2xl leading-relaxed text-slate-600">
-                                            相模高校の <input type="text" className="mx-3 border-b-2 border-[#D1CCE0] outline-none w-56 text-center text-[#7D6B9D] font-bold" value={questions.activity} onChange={(e) => handleQuestionChange('activity', e.target.value)} placeholder="例：部活動" /> を通じて、
+                                            相模高校の 
+                                            <input 
+                                                type="text" 
+                                                className="mx-3 border-b-2 border-[#D1CCE0] outline-none w-56 text-center text-[#7D6B9D] font-bold bg-transparent focus:border-[#7D6B9D]" 
+                                                value={questions.activity} 
+                                                onChange={(e) => handleQuestionChange('activity', e.target.value)} 
+                                                placeholder="例：部活動" 
+                                            /> 
+                                            を通じて、
                                         </div>
                                         <div className="relative bg-[#F8F7FA] p-8 rounded-[2rem] border-2 border-[#E8E4F0]">
                                             <div className="text-xl md:text-2xl leading-relaxed text-slate-700">
-                                                「 <input type="text" className="mx-2 border-b-2 border-[#7D6B9D] outline-none w-full md:w-[26rem] bg-transparent text-[#5D4E7B] font-bold" value={questions.theme} onChange={(e) => handleQuestionChange('theme', e.target.value)} placeholder="例：本当の優しさとは？" /> 」
+                                                「 
+                                                <input 
+                                                    type="text" 
+                                                    className="mx-2 border-b-2 border-[#7D6B9D] outline-none w-full md:w-[26rem] bg-transparent text-[#5D4E7B] font-bold focus:border-[#4B3D66]" 
+                                                    value={questions.theme} 
+                                                    onChange={(e) => handleQuestionChange('theme', e.target.value)} 
+                                                    placeholder="例：本当の優しさとは何か？" 
+                                                /> 
+                                                」
                                             </div>
                                             <div className="mt-4 text-[#7D6B9D] font-bold text-lg italic text-right">……という問いに出会いました。</div>
                                         </div>
                                     </div>
                                     <div className="mt-12 flex justify-between">
-                                        <button onClick={() => setStep(1)} className="text-slate-400 font-medium">まえに戻る</button>
-                                        <button onClick={generateAcademicPlan} disabled={loading} className="bg-[#A3B7D1] text-white px-10 py-3 rounded-2xl font-bold shadow-sm disabled:opacity-50">
+                                        <button onClick={() => setStep(1)} className="text-slate-400 font-medium hover:text-slate-600 transition-colors">まえに戻る</button>
+                                        <button onClick={generateAcademicPlan} disabled={loading} className="bg-[#A3B7D1] hover:bg-[#8CA5C1] text-white px-10 py-3 rounded-2xl font-bold shadow-sm disabled:opacity-50 transition-all transform hover:scale-105">
                                             {loading ? "分析中..." : "未来を導き出す"}
                                         </button>
                                     </div>
@@ -216,16 +248,20 @@
                                         専門的に学びたいと考えています。
                                     </div>
                                     <div className="max-w-2xl mx-auto bg-white p-6 rounded-2xl border-2 border-[#E6F4EA] text-left mb-10">
+                                        <div className="text-[10px] font-bold text-[#2D6A4F] mb-1">ANALYSIS RESULT</div>
                                         <p className="text-slate-600 text-sm leading-relaxed">{result.reason}</p>
                                     </div>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 no-print">
-                                        <button onClick={() => setStep(2)} className="border-2 border-slate-100 text-slate-500 py-3 rounded-2xl font-bold text-sm">問いを直す</button>
-                                        <button onClick={resetAll} className="border-2 border-rose-100 text-rose-400 py-3 rounded-2xl font-bold text-sm">最初からやり直す</button>
-                                        <button onClick={() => window.print()} className="sm:col-span-2 bg-[#7B956D] text-white py-3 px-6 rounded-2xl font-bold shadow-md">保存・印刷する</button>
+                                        <button onClick={() => setStep(2)} className="border-2 border-slate-100 text-slate-500 py-3 rounded-2xl font-bold text-sm hover:bg-slate-50 transition-colors">問いを直す</button>
+                                        <button onClick={resetAll} className="border-2 border-rose-100 text-rose-400 py-3 rounded-2xl font-bold text-sm hover:bg-rose-50 transition-colors">最初からやり直す</button>
+                                        <button onClick={() => window.print()} className="sm:col-span-2 bg-[#7B956D] hover:bg-[#5A734D] text-white py-3 px-6 rounded-2xl font-bold shadow-md transition-all">結果を保存・印刷する</button>
                                     </div>
                                 </div>
                             </div>
                         )}
+                        <footer className="mt-12 text-center text-slate-300 text-[10px] font-bold tracking-widest no-print">
+                            SAGAMIHARA HIGH SCHOOL • CAREER DESIGN APP
+                        </footer>
                     </div>
                 </div>
             );
