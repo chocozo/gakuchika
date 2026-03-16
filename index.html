@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ぼくのガクチカ 紡ごう！あなただけの相模ストーリー</title>
-    <!-- ライブラリの読み込み -->
+    <!-- 外部ライブラリの読み込み -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -20,7 +20,7 @@
         .animate-fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
-        /* ボタンのスタイル */
+        /* ボタンの共通スタイル */
         .btn-primary {
             background-color: #A8D1A3;
             color: white;
@@ -38,7 +38,12 @@
             color: #cbd5e1;
         }
         
-        @media print { .no-print { display: none; } }
+        /* 印刷設定 */
+        @media print { 
+            .no-print { display: none !important; }
+            body { background-color: white; }
+            .bg-white { border: 1px solid #eee; }
+        }
     </style>
 </head>
 <body>
@@ -50,7 +55,8 @@
         const App = () => {
             const [step, setStep] = useState(1);
             const [loading, setLoading] = useState(false);
-            // 初期値を空（またはプレースホルダー）に設定
+            
+            // 初期状態
             const [result, setResult] = useState({ study1: '　　学', study2: '　　学', reason: '' });
             
             const [quadrants, setQuadrants] = useState({
@@ -76,24 +82,23 @@
                 setStep(1);
             };
 
-            // レイアウト確認のため、APIを呼ばずに即座に次へ進む
+            // レイアウト確認のため、空欄でも即座に次へ進む
             const generateAcademicPlan = () => {
                 setLoading(true);
                 
-                // 通信を模した短い遅延のあと、空の状態を維持して表示
+                // 演出として少しだけ待機時間を設ける（0.5秒）
                 setTimeout(() => {
-                    // 入力がある場合はその内容に基づいたダミーを表示、なければ空のまま
                     if (questions.activity || questions.theme) {
                         setResult({
                             study1: "〇〇学",
                             study2: "△△学",
-                            reason: "（ここに分析結果の文章が表示されます）"
+                            reason: "入力された問いに基づいた分析結果がここに表示されます。現在はレイアウト確認モードです。"
                         });
                     } else {
                         setResult({
                             study1: "　　学",
                             study2: "　　学",
-                            reason: "（ここに問いに対する解説文が表示されます）"
+                            reason: "（ここに問いに対する解説文が表示されます。現在は空欄のため表示されていません）"
                         });
                     }
                     setStep(3);
@@ -141,13 +146,13 @@
                                         </div>
                                     </div>
                                     <div className="mt-6 flex justify-end">
-                                        <button onClick={() => setStep(2)} className="btn-primary px-10 py-2 rounded-xl font-bold">次へ</button>
+                                        <button onClick={() => setStep(2)} className="btn-primary px-10 py-2 rounded-xl font-bold shadow-sm">次へ</button>
                                     </div>
                                 </div>
                             </div>
                         )}
 
-                        {/* STEP 2: 問い */}
+                        {/* STEP 2: 問いの整理 */}
                         {step === 2 && (
                             <div className="bg-white rounded-[2rem] shadow-sm p-10 md:p-16 animate-fade-in text-center relative border border-slate-50">
                                 <div className="text-xl md:text-2xl leading-[4rem] text-slate-600">
@@ -159,7 +164,7 @@
                                 </div>
 
                                 <div className="mt-12 flex justify-between items-center">
-                                    <button onClick={() => setStep(1)} className="text-slate-400 font-bold">戻る</button>
+                                    <button onClick={() => setStep(1)} className="text-slate-400 font-bold hover:text-slate-600 transition-colors">戻る</button>
                                     <button onClick={generateAcademicPlan} disabled={loading} className="btn-primary px-12 py-3 rounded-xl font-bold shadow-sm disabled:opacity-50">
                                         {loading ? "表示中..." : "未来を導き出す"}
                                     </button>
@@ -167,22 +172,22 @@
                             </div>
                         )}
 
-                        {/* STEP 3: 結果 */}
+                        {/* STEP 3: 分析結果 */}
                         {step === 3 && (
                             <div className="bg-white rounded-[2rem] shadow-sm p-10 md:p-16 animate-fade-in text-center border-4 border-[#F0FAF0]">
-                                <div className="text-2xl md:text-3xl leading-relaxed text-slate-700 mb-10">
+                                <div className="text-2xl md:text-3xl leading-[4.5rem] text-slate-700 mb-10">
                                     大学では<br />
-                                    <span className="bg-[#FFFCE8] px-4 py-1 rounded-lg font-black text-[#856404] mx-2 border-b-4 border-[#FFE082]">{result.study1}</span>
+                                    <span className="inline-block bg-[#FFFCE8] px-4 py-1 my-2 rounded-lg font-black text-[#856404] mx-2 border-b-4 border-[#FFE082]">{result.study1}</span>
                                     と
-                                    <span className="bg-[#FFFCE8] px-4 py-1 rounded-lg font-black text-[#856404] mx-2 border-b-4 border-[#FFE082]">{result.study2}</span>
+                                    <span className="inline-block bg-[#FFFCE8] px-4 py-1 my-2 rounded-lg font-black text-[#856404] mx-2 border-b-4 border-[#FFE082]">{result.study2}</span>
                                     を学びたい！
                                 </div>
                                 <div className="max-w-2xl mx-auto bg-[#F9FBFA] p-8 rounded-3xl text-left border border-[#E6F4EA] mb-12">
-                                    <p className="text-slate-600 leading-loose min-h-[100px]">{result.reason}</p>
+                                    <p className="text-slate-600 leading-loose min-h-[100px] whitespace-pre-wrap">{result.reason}</p>
                                 </div>
                                 <div className="flex justify-center gap-4 no-print">
-                                    <button onClick={resetAll} className="border-2 border-slate-100 text-slate-400 px-8 py-3 rounded-xl font-bold">最初から</button>
-                                    <button onClick={() => window.print()} className="bg-[#7B956D] text-white px-12 py-3 rounded-xl font-bold shadow-md">印刷して保存</button>
+                                    <button onClick={resetAll} className="border-2 border-slate-100 text-slate-400 px-8 py-3 rounded-xl font-bold hover:bg-slate-50 transition-colors">最初から</button>
+                                    <button onClick={() => window.print()} className="bg-[#7B956D] text-white px-12 py-3 rounded-xl font-bold shadow-md hover:bg-[#6A845C] transition-colors">印刷して保存</button>
                                 </div>
                             </div>
                         )}
